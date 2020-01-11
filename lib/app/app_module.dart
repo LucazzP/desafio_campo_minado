@@ -1,4 +1,5 @@
 import 'package:desafio_campo_minado/app/app_bloc.dart';
+import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter/material.dart';
 import 'package:desafio_campo_minado/app/app_widget.dart';
@@ -13,6 +14,7 @@ class AppModule extends MainModule {
   @override
   List<Router> get routers => [
         Router('/', module: HomeModule()),
+        Router('/game', module: GameModule()),
       ];
 
   @override
