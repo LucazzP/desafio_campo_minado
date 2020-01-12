@@ -4,6 +4,8 @@ enum SquareState { released, flag, pressed }
 
 class SquareWidget extends StatelessWidget {
   final bool colorSwitch;
+  final int posX;
+  final int posY;
   final Function onTap;
   final Function onLongTap;
   final SquareState state;
@@ -16,7 +18,7 @@ class SquareWidget extends StatelessWidget {
       this.onTap,
       this.onLongTap,
       this.state = SquareState.released,
-      this.bombProximity, this.isBomb})
+      this.bombProximity, this.isBomb, this.posX, this.posY})
       : super(key: key);
 
   final Map<int, Color> colorText = <int, Color>{
