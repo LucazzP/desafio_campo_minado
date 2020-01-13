@@ -9,7 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController controller = TextEditingController(text: '15');
+  final TextEditingController controller = TextEditingController(text: '30');
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
                 decoration: InputDecoration(labelText: 'Numero de bombas:'),
                 textAlign: TextAlign.center,
                 controller: controller,
+                keyboardType: TextInputType.number,
               ),
             ),
             Container(height: 20,),

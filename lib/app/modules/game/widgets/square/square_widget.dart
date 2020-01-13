@@ -1,3 +1,4 @@
+import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_bloc.dart';
 import 'package:flutter/material.dart';
 
 enum SquareState { released, flag, pressed }
@@ -6,10 +7,13 @@ class SquareWidget extends StatelessWidget {
   final bool colorSwitch;
   final int posX;
   final int posY;
-  final Function onTap;
-  final Function onLongTap;
-  final SquareState state;
+  /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
+  final Function(bool, int) onTap;
+   /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
+  final Function(bool, int) onLongTap;
   final bool isBomb;
+  SquareState get state => _bloc.state.value;
+  Sink get sinkState => _bloc.state.sink;
   final int bombProximity;
 
   SquareWidget(
@@ -17,7 +21,6 @@ class SquareWidget extends StatelessWidget {
       this.colorSwitch = true,
       this.onTap,
       this.onLongTap,
-      this.state = SquareState.released,
       this.bombProximity, this.isBomb, this.posX, this.posY})
       : super(key: key);
 
@@ -33,27 +36,38 @@ class SquareWidget extends StatelessWidget {
     9: Colors.blueGrey,
   };
 
+  final SquareBloc _bloc = SquareBloc();
+
   @override
   Widget build(BuildContext context) {
-    return Ink(
-      color: state != SquareState.pressed
-          ? colorSwitch ? Colors.green[400] : Colors.green[600]
-          : colorSwitch ? Colors.brown[100] : Colors.brown[200],
-      child: InkWell(
-        onTap: state != SquareState.pressed ? onTap : null,
-        onLongPress: state != SquareState.pressed ? onLongTap : null,
-        splashColor: Colors.green[800],
-        child: Container(
-            height: 30,
-            width: 30,
-            alignment: Alignment.center,
-            child: _getIcon()),
-      ),
+    return StreamBuilder<SquareState>(
+      stream: _bloc.state.stream,
+      builder: (context, snapshot) {
+        return Ink(
+          color: snapshot.data != SquareState.pressed
+              ? colorSwitch ? Colors.green[400] : Colors.green[600]
+              : colorSwitch ? Colors.brown[100] : Colors.brown[200],
+          child: InkWell(
+            onTap: snapshot.data != SquareState.pressed ? (){
+              onTap(isBomb, bombProximity);
+            } : null,
+            onLongPress: snapshot.data != SquareState.pressed ? (){
+              onLongTap(isBomb, bombProximity);
+            } : null,
+            splashColor: Colors.green[800],
+            child: Container(
+                height: 30,
+                width: 30,
+                alignment: Alignment.center,
+                child: _getIcon()),
+          ),
+        );
+      }
     );
   }
 
   Widget _getIcon() {
-    if(state == SquareState.flag){
+    if(_bloc.state.value == SquareState.flag){
       return Icon(
           Icons.flag,
           color: Colors.red[700],
@@ -62,8 +76,8 @@ class SquareWidget extends StatelessWidget {
       return Icon(Icons.ac_unit, color: Colors.red[700],); 
     } else {
       return Text(
-          state == SquareState.pressed
-              ? bombProximity != null ? bombProximity.toString() : ''
+          _bloc.state.value == SquareState.pressed
+              ? bombProximity != null && bombProximity != 0 ? bombProximity.toString() : ''
               : '',
           style: TextStyle(
               color: colorText[bombProximity],
