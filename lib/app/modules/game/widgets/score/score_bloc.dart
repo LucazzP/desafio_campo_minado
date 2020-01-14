@@ -1,12 +1,26 @@
 import 'dart:async';
 
+import 'package:desafio_campo_minado/app/modules/game/game_bloc.dart';
+import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ScoreBloc extends Disposable {
   BehaviorSubject<int> flags = BehaviorSubject<int>();
-  BehaviorSubject<int> secondsElapsed = BehaviorSubject<int>();
+  BehaviorSubject<int> secondsElapsed = BehaviorSubject<int>.seeded(0);
   Stopwatch _stopwatch = Stopwatch();
+  GameBloc gameBloc = GameModule.to.get<GameBloc>();
+
+  ScoreBloc() {
+    serverSync();
+  }
+
+  void serverSync() {
+    gameBloc.gameOut.listen((game) {
+      if (!flags.isClosed) if (game.flags != flags.value)
+        flags.sink.add(game.flags);
+    });
+  }
 
   void startTimer() {
     if (!_stopwatch.isRunning) {

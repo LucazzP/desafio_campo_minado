@@ -5,11 +5,11 @@ import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
 import 'package:flutter/material.dart';
 
 class ScoreWidget extends StatelessWidget {
-  final GameModel game;
   final ScoreBloc bloc = GameModule.to.get<ScoreBloc>();
+  final GameBloc gameBloc = GameModule.to.get<GameBloc>();
 
-  ScoreWidget(this.game, {Key key}) : super(key: key){
-    bloc.flags.sink.add(game.bombs);
+  ScoreWidget({Key key}) : super(key: key){
+    if(gameBloc.game.bombs != null) bloc.flags.sink.add(gameBloc.game.bombs);
   }
 
   @override

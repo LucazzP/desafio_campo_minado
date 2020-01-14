@@ -15,7 +15,7 @@ class SquareWidget extends StatelessWidget {
   final Function(bool, int) onLongTap;
   final bool isBomb;
   SquareState get state => _bloc.state.value;
-  Sink get sinkState => _bloc.state.sink;
+  Sink<SquareState> get sinkState => _bloc.state.sink;
   final int bombProximity;
 
   SquareWidget(

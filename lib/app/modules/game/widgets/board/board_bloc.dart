@@ -8,15 +8,41 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BoardBloc extends Disposable {
-  GameModel game;
+  final Function(GameModel newGame) updateDataServer;
+  final Stream<GameModel> stream;
+  final GameModel Function() getGame;
+  final bool Function() _isAlive;
+  final Function lose;
+  final Function win;
   var listTableRows = BehaviorSubject<List<TableRow>>();
-  GameBloc gameBloc = GameModule.to.get<GameBloc>();
   ScoreBloc scoreBloc = GameModule.to.get<ScoreBloc>();
-  StatusGame get statusGame => gameBloc.statusGame.value;
-  bool get isAlive => statusGame == StatusGame.running;
+  bool get isAlive => _isAlive();
+  GameModel get game => getGame();
 
-  BoardBloc(this.game) {
+  BoardBloc(this.updateDataServer, this.stream, this.getGame, this._isAlive, this.lose, this.win) {
+    resetBoard();
+    serverSync();
+    _verifyChanges(game);
+  }
+
+  void resetBoard(){
     listTableRows.sink.add(_generateTable(game));
+  }
+
+  void serverSync(){
+    stream.listen((_game) => _verifyChanges(_game));
+  }
+
+  void _verifyChanges(GameModel _game){
+    listTableRows.value.forEach((tableRow){
+      tableRow.children.forEach((square){
+        SquareWidget squareWidget = square as SquareWidget;
+        if(_game.listBombs != null) if(squareWidget.isBomb != _game.listBombs[squareWidget.posY][squareWidget.posX]) resetBoard();
+        if(squareWidget.state != _game.listStates[squareWidget.posY][squareWidget.posX]){
+          squareWidget.sinkState.add(_game.listStates[squareWidget.posY][squareWidget.posX]);
+        }
+      });
+    });
   }
 
   void _probePress(int y, int x) {
@@ -24,11 +50,12 @@ class BoardBloc extends Disposable {
     SquareWidget square = _pickSquareFromList(y, x);
     if (square.state == SquareState.flag) return;
     if (game.listBombs[y][x]) {
-      square.sinkState.add(SquareState.pressed);
-      gameBloc.lose();
+      _changeSquareState(square, SquareState.pressed);
+      lose();
     } else {
       _pressSquare(y, x);
       scoreBloc.startTimer();
+      updateDataServer(game);
     }
   }
 
@@ -36,7 +63,7 @@ class BoardBloc extends Disposable {
     if (!_isValidPosition(y, x)) return;
     SquareWidget square = _pickSquareFromList(y, x);
     if (square.state == SquareState.pressed) return;
-    square.sinkState.add(SquareState.pressed);
+    _changeSquareState(square, SquareState.pressed);
 
     if (_sideBombs(y, x) > 0) return;
 
@@ -54,13 +81,19 @@ class BoardBloc extends Disposable {
     if (!isAlive) return;
     SquareWidget square = _pickSquareFromList(y, x);
     if (square.state == SquareState.flag) {
-      square.sinkState.add(SquareState.released);
-      scoreBloc.addFlag();
+      _changeSquareState(square, SquareState.released);
+      game.flags++;
     } else {
-      square.sinkState.add(SquareState.flag);
-      scoreBloc.removeFlag();
+      _changeSquareState(square, SquareState.flag);
+      game.flags--;
     }
+    updateDataServer(game);
     _verifyIfWon();
+  }
+
+  void _changeSquareState(SquareWidget square, SquareState state){
+    square.sinkState.add(state);
+    game.listStates[square.posY][square.posX] = state;
   }
 
   _verifyIfWon(){
@@ -72,7 +105,7 @@ class BoardBloc extends Disposable {
           if(squareWidget.isBomb && squareWidget.state != SquareState.flag) won = false;
         });
       });
-      if(won) gameBloc.win();
+      if(won) win();
     }
     
   }
@@ -90,11 +123,20 @@ class BoardBloc extends Disposable {
     return count;
   }
 
-  int bombs(int y, int x) => _isValidPosition(y, x) && game.listBombs[y][x] ? 1 : 0;
+  int bombs(int y, int x) {
+    if(_isValidPosition(y, x)){
+      if(game.listBombs[y][x]){
+        return 1;
+      }
+    }
+    return 0;
+  }
+
   bool _isValidPosition(int posY, int posX) {
     if (posX < 0 || posY < 0) return false;
-    if (posY > (game.listBombs.length - 1)) return false;
-    if (posX > (game.listBombs[posY].length - 1)) return false;
+    if(game.listBombs ==  null) return false;
+    if (posY > (game.listBombs.length  - 1)) return false;
+    if (posX > (game.listBombs[posY].length  - 1)) return false;
     return true;
   }
 
@@ -105,7 +147,6 @@ class BoardBloc extends Disposable {
   }
 
   List<TableRow> _generateTable(GameModel game) {
-    gameBloc.statusGame.sink.add(StatusGame.running);
     return List.generate(
       game.rows,
       (heightRef) => TableRow(

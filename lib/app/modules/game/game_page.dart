@@ -22,6 +22,7 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void initState() {
+    bloc.createGame(widget.game, 15, 10, false);
     bloc.statusGame.listen((status) {
       if (status != StatusGame.running) {
         resultGame(status);
@@ -35,32 +36,53 @@ class _GamePageState extends State<GamePage> {
     return Scaffold(
       backgroundColor: Colors.green[800],
       appBar: AppBar(
-        title: ScoreWidget(widget.game),
+        title: ScoreWidget(),
       ),
-      body: Container(
-        padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-        alignment: Alignment.topCenter,
-        child: Column(
-          children: <Widget>[
-            BoardWidget(game: bloc.createGame(widget.game.bombs, 15, 10)),
-            Expanded(
-              child: Center(
-                child: Text(
-                  "Código do jogo: ${bloc.gameCode}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+      body: StreamBuilder<GameModel>(
+        stream: bloc.newGameObserver.stream,
+        builder: (context, snapshot) {
+          return !snapshot.hasData
+              ? Center(child: CircularProgressIndicator())
+              : Container(
+                  padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                  alignment: Alignment.topCenter,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        BoardWidget(
+                          stream: bloc.gameOut,
+                          getGame: () => bloc.game,
+                          isAlive: () =>
+                              bloc.statusGame.value == StatusGame.running,
+                          updateDataServer: (game) {
+                            bloc.game = game;
+                          },
+                          lose: () => bloc.lose(),
+                          win: () => bloc.win(),
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * .1,
+                          child: Center(
+                            child: Text(
+                              "Código do jogo: ${bloc.gameCode}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            )
-          ],
-        ),
+                );
+        },
       ),
     );
   }
 
   Future<void> resultGame(StatusGame status) async {
+    // bloc.game = bloc.game.copyWith(active: false);
     bool again = await showDialog(
         context: context,
         child: AlertDialog(
@@ -74,10 +96,6 @@ class _GamePageState extends State<GamePage> {
             )
           ],
         ));
-    if (again ?? false) {
-      setState(() {
-        GameModule.to.get<ScoreBloc>().resetTimer();
-      });
-    }
+    bloc.resetGame(again ?? false);
   }
 }

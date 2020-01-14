@@ -82,7 +82,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Container(height: 20,),
                       RaisedButton(
-                        onPressed: () => Navigator.of(context).pushNamed('/game', arguments: 10),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/game', arguments: GameModel(gameCode: controllerCode.text.toUpperCase()));
+                        },
                         child: Text('Ir para o jogo'),
                       ),
                     ],
