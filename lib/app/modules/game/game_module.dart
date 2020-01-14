@@ -14,7 +14,7 @@ class GameModule extends ChildModule {
 
   @override
   List<Router> get routers => [
-        Router('/', child: (_, args) => GamePage(bombs: args.data)),
+        Router('/', child: (_, args) => GamePage(game: args.data)),
       ];
 
   static Inject get to => Inject<GameModule>.of();

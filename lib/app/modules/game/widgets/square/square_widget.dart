@@ -7,9 +7,11 @@ class SquareWidget extends StatelessWidget {
   final bool colorSwitch;
   final int posX;
   final int posY;
+
   /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
   final Function(bool, int) onTap;
-   /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
+
+  /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
   final Function(bool, int) onLongTap;
   final bool isBomb;
   SquareState get state => _bloc.state.value;
@@ -21,8 +23,14 @@ class SquareWidget extends StatelessWidget {
       this.colorSwitch = true,
       this.onTap,
       this.onLongTap,
-      this.bombProximity, this.isBomb, this.posX, this.posY})
-      : super(key: key);
+      this.bombProximity,
+      this.isBomb,
+      this.posX,
+      this.posY,
+      SquareState initialState})
+      : super(key: key) {
+    if(initialState != null) sinkState.add(initialState);
+  }
 
   final Map<int, Color> colorText = <int, Color>{
     1: Colors.blue[800],
@@ -41,49 +49,54 @@ class SquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<SquareState>(
-      stream: _bloc.state.stream,
-      builder: (context, snapshot) {
-        return Ink(
-          color: snapshot.data != SquareState.pressed
-              ? colorSwitch ? Colors.green[400] : Colors.green[600]
-              : colorSwitch ? Colors.brown[100] : Colors.brown[200],
-          child: InkWell(
-            onTap: snapshot.data != SquareState.pressed ? (){
-              onTap(isBomb, bombProximity);
-            } : null,
-            onLongPress: snapshot.data != SquareState.pressed ? (){
-              onLongTap(isBomb, bombProximity);
-            } : null,
-            splashColor: Colors.green[800],
-            child: Container(
-                height: 30,
-                width: 30,
-                alignment: Alignment.center,
-                child: _getIcon()),
-          ),
-        );
-      }
-    );
+        stream: _bloc.state.stream,
+        builder: (context, snapshot) {
+          return Ink(
+            color: snapshot.data != SquareState.pressed
+                ? colorSwitch ? Colors.green[400] : Colors.green[600]
+                : colorSwitch ? Colors.brown[100] : Colors.brown[200],
+            child: InkWell(
+              onTap: snapshot.data != SquareState.pressed
+                  ? () {
+                      onTap(isBomb, bombProximity);
+                    }
+                  : null,
+              onLongPress: snapshot.data != SquareState.pressed
+                  ? () {
+                      onLongTap(isBomb, bombProximity);
+                    }
+                  : null,
+              splashColor: Colors.green[800],
+              child: Container(
+                  height: 30,
+                  width: 30,
+                  alignment: Alignment.center,
+                  child: _getIcon()),
+            ),
+          );
+        });
   }
 
   Widget _getIcon() {
-    if(_bloc.state.value == SquareState.flag){
+    if (_bloc.state.value == SquareState.flag) {
       return Icon(
-          Icons.flag,
-          color: Colors.red[700],
-        );
-    } else if(isBomb) {
-      return Icon(Icons.ac_unit, color: Colors.red[700],); 
+        Icons.flag,
+        color: Colors.red[700],
+      );
+    } else if (isBomb && state == SquareState.pressed) {
+      return Text("💣");
     } else {
       return Text(
-          _bloc.state.value == SquareState.pressed
-              ? bombProximity != null && bombProximity != 0 ? bombProximity.toString() : ''
-              : '',
-          style: TextStyle(
-              color: colorText[bombProximity],
-              fontSize: 20,
-              fontWeight: FontWeight.w800),
-        );
+        _bloc.state.value == SquareState.pressed
+            ? bombProximity != null && bombProximity != 0
+                ? bombProximity.toString()
+                : ''
+            : '',
+        style: TextStyle(
+            color: colorText[bombProximity],
+            fontSize: 20,
+            fontWeight: FontWeight.w800),
+      );
     }
   }
 }

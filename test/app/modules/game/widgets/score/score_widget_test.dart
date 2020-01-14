@@ -6,7 +6,7 @@ import 'package:desafio_campo_minado/app/modules/game/widgets/score/score_widget
 
 main() {
   testWidgets('ScoreWidget has message', (WidgetTester tester) async {
-    await tester.pumpWidget(buildTestableWidget(ScoreWidget()));
+    await tester.pumpWidget(buildTestableWidget(ScoreWidget(15)));
     final textFinder = find.text('Score');
     expect(textFinder, findsOneWidget);
   });

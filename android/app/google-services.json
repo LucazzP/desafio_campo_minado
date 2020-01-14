@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1003925781372",
+    "firebase_url": "https://campo-minado-a20d1.firebaseio.com",
+    "project_id": "campo-minado-a20d1",
+    "storage_bucket": "campo-minado-a20d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003925781372:android:1ab8e3a0d6d4494c4602f9",
+        "android_client_info": {
+          "package_name": "dev.polazzo.desafio_campo_minado"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1003925781372-sj4gb8qj0460l5qn77f1jq0n362l0s4a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEMx6RoaxYpSQWpXcqEWbEte0aRn8399A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003925781372-sj4gb8qj0460l5qn77f1jq0n362l0s4a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

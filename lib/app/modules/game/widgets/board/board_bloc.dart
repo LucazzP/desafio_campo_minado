@@ -1,29 +1,34 @@
+import 'package:desafio_campo_minado/app/modules/game/game_bloc.dart';
+import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
+import 'package:desafio_campo_minado/app/modules/game/widgets/score/score_bloc.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_widget.dart';
+import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BoardBloc extends Disposable {
-  final List<List<bool>> listBombs;
-  bool alive = false;
-  var listRows = BehaviorSubject<List<TableRow>>();
+  GameModel game;
+  var listTableRows = BehaviorSubject<List<TableRow>>();
+  GameBloc gameBloc = GameModule.to.get<GameBloc>();
+  ScoreBloc scoreBloc = GameModule.to.get<ScoreBloc>();
+  StatusGame get statusGame => gameBloc.statusGame.value;
+  bool get isAlive => statusGame == StatusGame.running;
 
-  BoardBloc(int rows, int cols, this.listBombs) {
-    listRows.sink.add(_generateTable(rows, cols));
+  BoardBloc(this.game) {
+    listTableRows.sink.add(_generateTable(game));
   }
 
   void _probePress(int y, int x) {
-    if (!alive) return;
+    if (!isAlive) return;
     SquareWidget square = _pickSquareFromList(y, x);
     if (square.state == SquareState.flag) return;
-    if (listBombs[y][x]) {
+    if (game.listBombs[y][x]) {
       square.sinkState.add(SquareState.pressed);
-      alive = false;
-      // timer.cancel();
-      // stopwatch.stop(); // force the stopwatch to stop.
+      gameBloc.lose();
     } else {
       _pressSquare(y, x);
-      // if (!stopwatch.isRunning) stopwatch.start();
+      scoreBloc.startTimer();
     }
   }
 
@@ -46,15 +51,30 @@ class BoardBloc extends Disposable {
   }
 
   void _flag(int y, int x) {
-    if (!alive) return;
+    if (!isAlive) return;
     SquareWidget square = _pickSquareFromList(y, x);
     if (square.state == SquareState.flag) {
       square.sinkState.add(SquareState.released);
-      // --minesFound;
+      scoreBloc.addFlag();
     } else {
       square.sinkState.add(SquareState.flag);
-      // ++minesFound;
+      scoreBloc.removeFlag();
     }
+    _verifyIfWon();
+  }
+
+  _verifyIfWon(){
+    if(scoreBloc.flags.value == 0){
+      bool won = true;
+      listTableRows.value.forEach((tableRow){
+        tableRow.children.forEach((square){
+          SquareWidget squareWidget = (square as SquareWidget);
+          if(squareWidget.isBomb && squareWidget.state != SquareState.flag) won = false;
+        });
+      });
+      if(won) gameBloc.win();
+    }
+    
   }
 
   int _sideBombs(int y, int x) {
@@ -70,27 +90,27 @@ class BoardBloc extends Disposable {
     return count;
   }
 
-  int bombs(int y, int x) => _isValidPosition(y, x) && listBombs[y][x] ? 1 : 0;
+  int bombs(int y, int x) => _isValidPosition(y, x) && game.listBombs[y][x] ? 1 : 0;
   bool _isValidPosition(int posY, int posX) {
     if (posX < 0 || posY < 0) return false;
-    if (posY > (listBombs.length - 1)) return false;
-    if (posX > (listBombs[posY].length - 1)) return false;
+    if (posY > (game.listBombs.length - 1)) return false;
+    if (posX > (game.listBombs[posY].length - 1)) return false;
     return true;
   }
 
   SquareWidget _pickSquareFromList(int posY, int posX) {
     //! If reach to the border, will not found a square.
     if (!_isValidPosition(posY, posX)) return null;
-    return listRows.value[posY].children[posX] as SquareWidget;
+    return listTableRows.value[posY].children[posX] as SquareWidget;
   }
 
-  List<TableRow> _generateTable(int rows, int cols) {
-    alive = true;
+  List<TableRow> _generateTable(GameModel game) {
+    gameBloc.statusGame.sink.add(StatusGame.running);
     return List.generate(
-      rows,
+      game.rows,
       (heightRef) => TableRow(
         children: List.generate(
-          cols,
+          game.cols,
           (widthRef) => _createSquare(heightRef, widthRef),
         ),
       ),
@@ -102,7 +122,8 @@ class BoardBloc extends Disposable {
         posX: posX,
         posY: posY,
         bombProximity: _sideBombs(posY, posX),
-        isBomb: listBombs[posY][posX],
+        isBomb: game.listBombs[posY][posX],
+        initialState: game.listStates[posY][posX],
         onTap: (isBomb, bombs) => this._probePress(posY, posX),
         onLongTap: (isBomb, bombs) => this._flag(posY, posX),
       );
@@ -110,6 +131,6 @@ class BoardBloc extends Disposable {
   //dispose will be called automatically by closing its streams
   @override
   void dispose() {
-    listRows.close();
+    listTableRows.close();
   }
 }

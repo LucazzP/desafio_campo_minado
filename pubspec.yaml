@@ -17,10 +17,13 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  cloud_firestore: ^0.13.0+1
+  firebase_core: ^0.4.3+2
   dio: ^3.0.8
   rxdart: ^0.23.1
   flutter_modular: ^0.1.8
   async_redux: ^2.4.2
+  random_string: ^2.0.1
   flutter:
     sdk: flutter
 
