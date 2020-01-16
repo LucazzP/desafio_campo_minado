@@ -82,7 +82,6 @@ class _GamePageState extends State<GamePage> {
   }
 
   Future<void> resultGame(StatusGame status) async {
-    // bloc.game = bloc.game.copyWith(active: false);
     bool again = await showDialog(
         context: context,
         child: AlertDialog(

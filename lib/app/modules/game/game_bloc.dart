@@ -66,13 +66,13 @@ class GameBloc extends Disposable {
   }
 
   void win() {
+    game = game.copyWith(active: false);
     statusGame.sink.add(StatusGame.won);
-    GameModule.to.get<ScoreBloc>().stopTimer();
   }
 
   void lose() {
+    game = game.copyWith(active: false);
     statusGame.sink.add(StatusGame.lose);
-    GameModule.to.get<ScoreBloc>().stopTimer();
   }
 
   Future<GameModel> createGame(GameModel gameModel, int rows, int cols,

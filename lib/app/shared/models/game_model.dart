@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_widget.dart';
 import 'package:flutter/foundation.dart';
 
@@ -8,6 +9,7 @@ class GameModel {
   final int cols;
   final int bombs;
   int flags;
+  final DateTime initialTime;
   final String gameCode;
   final List<List<bool>> listBombs;
   List<List<SquareState>> listStates;
@@ -21,7 +23,8 @@ class GameModel {
       this.rows = 15,
       this.cols = 10,
       this.bombs,
-      this.flags}) {
+      this.flags,
+      this.initialTime}) {
     this.flags = this.flags ?? bombs;
     if (listStates == null)
       listStates = List.generate(
@@ -37,7 +40,7 @@ class GameModel {
           int cols,
           int bombs,
           int flags,
-          bool active}) =>
+          bool active, DateTime initialTime}) =>
       GameModel(
         bombs: bombs ?? this.bombs,
         cols: cols ?? this.cols,
@@ -47,6 +50,7 @@ class GameModel {
         listStates: listStates ?? this.listStates,
         rows: rows ?? this.rows,
         active: active ?? this.active,
+        initialTime: initialTime ?? this.initialTime,
       );
 
   GameModel mergeWith(GameModel game) => GameModel(
@@ -69,6 +73,7 @@ class GameModel {
           bombs: json['bombs'],
           flags: json['flags'],
           gameCode: json['gameCode'],
+          initialTime: json['initialTime'] == null ? null : (json['initialTime'] as Timestamp).toDate(),
           listStates: json['listStates'] == null
               ? null
               : json['listStates']
@@ -93,6 +98,7 @@ class GameModel {
     map['bombs'] = bombs;
     map['flags'] = flags;
     map['gameCode'] = gameCode;
+    map['initialTime'] = initialTime;
     map['listBombs'] = listBombs == null
         ? null
         : listBombs
@@ -115,6 +121,7 @@ class GameModel {
       bombs.hashCode ^
       flags.hashCode ^
       gameCode.hashCode ^
+      initialTime.hashCode ^
       listBombs.hashCode ^
       listStates.hashCode;
 
@@ -126,6 +133,7 @@ class GameModel {
       this.bombs == other.bombs &&
       this.flags == other.flags &&
       this.gameCode == other.gameCode &&
+      this.initialTime == other.initialTime &&
       this.listBombs == other.listBombs &&
       this.listStates != other.listStates;
 }
