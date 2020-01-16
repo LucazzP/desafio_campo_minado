@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:desafio_campo_minado/app/modules/game/game_bloc.dart';
 import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:desafio_campo_minado/app/shared/models/game_model.dart';

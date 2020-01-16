@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_widget.dart';
-import 'package:flutter/foundation.dart';
 
 class GameModel {
   final int rows;

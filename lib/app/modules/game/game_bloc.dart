@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:desafio_campo_minado/app/modules/game/game_repository.dart';
-import 'package:desafio_campo_minado/app/modules/game/widgets/board/board_bloc.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/score/score_bloc.dart';
 import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:random_string/random_string.dart';
 import 'package:rxdart/rxdart.dart';

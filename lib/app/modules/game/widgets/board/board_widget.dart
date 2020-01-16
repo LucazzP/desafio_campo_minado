@@ -1,6 +1,4 @@
-import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/board/board_bloc.dart';
-import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_widget.dart';
 import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
 import 'package:flutter/material.dart';
 

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:dio/dio.dart';
 
 class GameRepository extends Disposable {
   Stream<GameModel> streamGame(String gameCode) {

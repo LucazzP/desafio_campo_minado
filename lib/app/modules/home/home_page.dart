@@ -1,5 +1,3 @@
-import 'package:desafio_campo_minado/app/modules/home/home_bloc.dart';
-import 'package:desafio_campo_minado/app/modules/home/home_module.dart';
 import 'package:desafio_campo_minado/app/shared/models/game_model.dart';
 import 'package:flutter/material.dart';
 

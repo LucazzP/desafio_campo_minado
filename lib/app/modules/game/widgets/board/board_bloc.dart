@@ -1,4 +1,3 @@
-import 'package:desafio_campo_minado/app/modules/game/game_bloc.dart';
 import 'package:desafio_campo_minado/app/modules/game/game_module.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/score/score_bloc.dart';
 import 'package:desafio_campo_minado/app/modules/game/widgets/square/square_widget.dart';
