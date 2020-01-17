@@ -22,7 +22,7 @@ dependencies:
   dio: ^3.0.8
   rxdart: ^0.23.1
   flutter_modular: ^0.1.8
-  async_redux: ^2.4.2
+  async_redux: ^2.4.4
   random_string: ^2.0.1
   flutter:
     sdk: flutter
