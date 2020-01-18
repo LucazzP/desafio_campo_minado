@@ -25,4 +25,15 @@ class AppState {
       gameState: gameState ?? this.gameState,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppState &&
+          runtimeType == other.runtimeType &&
+          homeState == other.homeState &&
+          gameState == other.gameState;
+
+  @override
+  int get hashCode => homeState.hashCode ^ gameState.hashCode;
 }

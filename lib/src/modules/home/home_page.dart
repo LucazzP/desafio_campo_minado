@@ -1,6 +1,11 @@
-import 'package:desafio_campo_minado/src/modules/home/home_bloc.dart';
-import 'package:desafio_campo_minado/src/modules/home/home_module.dart';
+import 'package:async_redux/async_redux.dart';
+import 'package:desafio_campo_minado/src/app/app_module.dart';
+import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
+import 'package:desafio_campo_minado/src/app/redux/states.dart';
+import 'package:desafio_campo_minado/src/modules/game/widgets/square/square_widget.dart';
+import 'package:desafio_campo_minado/src/modules/home/redux/home_model.dart';
 import 'package:desafio_campo_minado/src/shared/models/game_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +21,6 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController controllerCode = TextEditingController();
   GlobalKey<FormState> formKeyNewGame = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyCode = GlobalKey<FormState>();
-  HomeBloc bloc = HomeModule.to.get<HomeBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -108,9 +112,9 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           alignment: Alignment.center,
-                          child: StreamBuilder<bool>(
-                            stream: bloc.validCode.stream,
-                            builder: (context, valid) {
+                          child: StoreConnector<AppState, HomeModel>(
+                            model: HomeModel(),
+                            builder: (context, homeModel) {
                               return TextFormField(
                                 validator: (value) {
                                   if (value.isEmpty || value.length != 6) {
@@ -119,43 +123,58 @@ class _HomePageState extends State<HomePage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Codigo de entrada:',
-                                  errorText: (valid.data ?? true) ? null : 'Código inválido'
-                                ),
+                                    labelText: 'Codigo de entrada:',
+                                    errorText: (homeModel.valid ?? true)
+                                        ? null
+                                        : 'Código inválido'),
                                 textAlign: TextAlign.center,
                                 controller: controllerCode,
-                                textCapitalization: TextCapitalization.characters,
+                                textCapitalization:
+                                    TextCapitalization.characters,
                                 maxLength: 6,
                               );
-                            }
+                            },
                           ),
                         ),
                         Container(
                           height: 20,
                         ),
-                        StreamBuilder<bool>(
-                          stream: bloc.validCode.stream,
-                          builder: (context, valid) {
-                            return RaisedButton(
-                              onPressed: valid.hasData ? () async {
-                                if (formKeyCode.currentState.validate()){
-                                  bloc.validCode.sink.add(null);
-                                  bool valid = await bloc.verifyCode(controllerCode.text);
-                                  bloc.validCode.sink.add(valid);
-                                  if(valid){
-                                    Navigator.of(context).pushNamed(
-                                      '/game',
-                                      arguments: GameModel(
-                                        gameCode: controllerCode.text.toUpperCase(),
+                        StoreConnector<AppState, HomeModel>(
+                            model: HomeModel(),
+                            builder: (context, homeModel) {
+                              return RaisedButton(
+                                onPressed: !homeModel.loading
+                                    ? () async {
+                                        String gameCode =
+                                            controllerCode.text.toUpperCase();
+                                        await homeModel.validateCode(
+                                          gameCode,
+                                          formKeyCode.currentState,
+                                          context,
+                                        );
+                                        if (States.homeState.validCode) {
+                                          Navigator.of(context).pushNamed(
+                                            '/game',
+                                            arguments: GameModel(
+                                              gameCode: gameCode,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    : null,
+                                child: !homeModel.loading
+                                    ? Text('Ir para o jogo')
+                                    : SizedBox(
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation(
+                                              Colors.white),
+                                        ),
+                                        width: 20,
                                       ),
-                                    );
-                                  }
-                                }
-                              } : null,
-                              child: valid.hasData ? Text('Ir para o jogo') : SizedBox(height: 20, child: CircularProgressIndicator(), width: 20,),
-                            );
-                          }
-                        ),
+                              );
+                            }),
                       ],
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desafio_campo_minado/src/modules/game/widgets/square/square_widget.dart';
+import 'package:desafio_campo_minado/src/shared/extensions.dart';
 
 class GameModel {
   final int rows;
@@ -37,7 +38,8 @@ class GameModel {
           int cols,
           int bombs,
           int flags,
-          bool active, DateTime initialTime}) =>
+          bool active,
+          DateTime initialTime}) =>
       GameModel(
         bombs: bombs ?? this.bombs,
         cols: cols ?? this.cols,
@@ -70,7 +72,9 @@ class GameModel {
           bombs: json['bombs'],
           flags: json['flags'],
           gameCode: json['gameCode'],
-          initialTime: json['initialTime'] == null ? null : (json['initialTime'] as Timestamp).toDate(),
+          initialTime: json['initialTime'] == null
+              ? null
+              : (json['initialTime'] as Timestamp).toDate(),
           listStates: json['listStates'] == null
               ? null
               : json['listStates']
@@ -131,6 +135,6 @@ class GameModel {
       this.flags == other.flags &&
       this.gameCode == other.gameCode &&
       this.initialTime == other.initialTime &&
-      this.listBombs == other.listBombs &&
-      this.listStates != other.listStates;
+      this.listBombs.equals<List<bool>>(other.listBombs) &&
+      this.listStates.equals<List<SquareState>>(other.listStates);
 }

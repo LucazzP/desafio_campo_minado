@@ -16,7 +16,6 @@ class GameBloc extends Disposable {
       BehaviorSubject<StatusGame>.seeded(StatusGame.running);
   BehaviorSubject<GameModel> _game =
       BehaviorSubject<GameModel>.seeded(GameModel());
-  BehaviorSubject<GameModel> _gameServerSide = BehaviorSubject<GameModel>();
   BehaviorSubject<GameModel> newGameObserver = BehaviorSubject<GameModel>();
 
   var repo = GameModule.to.get<GameRepository>();
@@ -54,7 +53,7 @@ class GameBloc extends Disposable {
     print(gameCode);
     listener = repo.streamGame(gameCode).listen((game) {
       // if (game == GameModel()) resetGame();
-      if (gameCode != null && !_gameServerSide.isClosed) {
+      if (gameCode != null && !_game.isClosed) {
         if (game.gameCode == _game.value.gameCode) {
           _game.sink.add(game);
         } else
@@ -130,7 +129,6 @@ class GameBloc extends Disposable {
   void dispose() {
     statusGame.close();
     _game.close();
-    _gameServerSide.close();
     newGameObserver.close();
   }
 }

@@ -2,23 +2,25 @@
 //
 //     final homeState = homeStateFromJson(jsonString);
 
-import 'package:async_redux/async_redux.dart';
-import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
-class HomeState extends BaseModel<AppState> {
+class HomeState {
   final bool validCode;
+  final bool loading;
 
   HomeState({
     @required this.validCode,
+    @required this.loading,
   });
 
   HomeState copyWith({
     bool validCode,
+    bool loading,
   }) =>
       HomeState(
         validCode: validCode ?? this.validCode,
+        loading: loading ?? this.loading,
       );
 
   factory HomeState.fromRawJson(String str) =>
@@ -28,16 +30,32 @@ class HomeState extends BaseModel<AppState> {
 
   factory HomeState.fromJson(Map<String, dynamic> json) => HomeState(
         validCode: json["validCode"],
+        loading: json["loading"],
       );
 
   Map<String, dynamic> toJson() => {
         "validCode": validCode,
+        "loading": loading,
       };
 
   factory HomeState.initialState() => HomeState(
-        validCode: true,
+        validCode: null,
+        loading: false,
       );
 
   @override
-  BaseModel fromStore() => HomeState();
+  String toString() {
+    return toJson().toString();
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HomeState &&
+          runtimeType == other.runtimeType &&
+          validCode == other.validCode &&
+          loading == other.loading;
+
+  @override
+  int get hashCode => validCode.hashCode ^ loading.hashCode;
 }
