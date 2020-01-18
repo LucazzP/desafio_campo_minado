@@ -9,22 +9,29 @@ class GameRepository extends Disposable {
         .document(gameCode)
         .snapshots()
         .map((snapshot) {
-          if(!snapshot.exists) return GameModel();
-          return GameModel.fromJson(snapshot.data);
-        });
-  }
-  Future<GameModel> getGame(String gameCode) async {
-    return GameModel.fromJson((await Firestore.instance
-        .collection("games")
-        .document(gameCode)
-        .get()).data);
+      if (!snapshot.exists) return GameModel();
+      return GameModel.fromJson(snapshot.data);
+    });
   }
 
-  Future createOrUpdateGameSession(GameModel game) {
-    return Firestore.instance
-        .collection("games")
-        .document(game.gameCode)
-        .setData(game.toJson());
+  Future<GameModel> getGame(String gameCode) async {
+    return GameModel.fromJson(
+        (await Firestore.instance.collection("games").document(gameCode).get())
+            .data);
+  }
+
+  Future<GameModel> createOrUpdateGameSession(GameModel game) async {
+    if (game == null) return null;
+    DocumentReference ref =
+        Firestore.instance.collection("games").document(game.gameCode);
+    
+    GameModel _game = game;
+    // DocumentSnapshot snap = await ref.get();
+    // if (snap.exists) {
+    //   _game = GameModel.fromJson(snap.data).mergeWith(game);
+    // }
+    ref.setData(_game.toJson());
+    return _game;
   }
 
   Future deleteGame(String gameCode) {

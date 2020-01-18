@@ -135,6 +135,6 @@ class GameModel {
       this.flags == other.flags &&
       this.gameCode == other.gameCode &&
       this.initialTime == other.initialTime &&
-      this.listBombs.equals<List<bool>>(other.listBombs) &&
-      this.listStates.equals<List<SquareState>>(other.listStates);
+      this.listBombs.equals<List<bool>, bool>(other.listBombs) &&
+      this.listStates.equals<List<SquareState>, SquareState>(other.listStates);
 }

@@ -1,18 +1,14 @@
 import 'package:async_redux/async_redux.dart';
 import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
 import 'package:desafio_campo_minado/src/app/redux/states.dart';
-import 'package:desafio_campo_minado/src/modules/game/game_bloc.dart';
 import 'package:desafio_campo_minado/src/modules/game/game_page.dart';
 import 'package:desafio_campo_minado/src/modules/game/game_repository.dart';
-import 'package:desafio_campo_minado/src/modules/game/widgets/score/score_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 class GameModule extends ChildModule {
   @override
   List<Bind> get binds => [
         Bind((i) => GameRepository()),
-        Bind((i) => ScoreBloc()),
-        Bind((i) => GameBloc()),
       ];
 
   @override

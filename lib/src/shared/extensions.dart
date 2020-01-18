@@ -1,23 +1,23 @@
 import 'package:flutter/foundation.dart';
 
 extension ListEqual<A> on List<A> {
-  bool equals<T>(List<T> otherList) {
+  bool equals<T, S>(List<T> otherList) {
     if ((this != null && otherList != null) &&
         (this.isNotEmpty && otherList.isNotEmpty) &&
-        (this.first is List && otherList.first is List)) {
-      T _listReduced;
-      T _otherListReduced;
-      _listReduced = (this as List<T>).reduce((a, b) {
-        T _list = a;
-        (_list as List).addAll((b as List));
+        (this.first is List<S> && otherList.first is List<S>)) {
+      List<S> _listReduced;
+      List<S> _otherListReduced;
+      _listReduced = List.castFrom<dynamic, List<S>>(this).reduce((a, b) {
+        List<S> _list = List.from(a);
+        _list.addAll(b);
         return _list;
       });
-      _otherListReduced = otherList.reduce((a, b) {
-        T _list = a;
-        (_list as List).addAll((b as List));
+      _otherListReduced = List.castFrom<dynamic, List<S>>(otherList).reduce((a, b) {
+        List<S> _list = List.from(a);
+        _list.addAll(b);
         return _list;
       });
-      return listEquals((_listReduced as List), (_otherListReduced as List));
+      return listEquals(_listReduced, _otherListReduced);
     }
     return listEquals(this, otherList);
   }

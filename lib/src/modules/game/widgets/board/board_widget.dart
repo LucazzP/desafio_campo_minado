@@ -1,43 +1,44 @@
-import 'package:desafio_campo_minado/src/modules/game/widgets/board/board_bloc.dart';
-import 'package:desafio_campo_minado/src/shared/models/game_model.dart';
+import 'package:async_redux/async_redux.dart';
+import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
+import 'package:desafio_campo_minado/src/modules/game/widgets/board/board_view_model.dart';
 import 'package:flutter/material.dart';
 
-class BoardWidget extends StatefulWidget {
-  final Function(GameModel newGame) updateDataServer;
-  final Stream<GameModel> stream;
-  final GameModel Function() getGame;
-  final bool Function() isAlive;
-  final Function lose;
-  final Function win;
-
-  BoardWidget({Key key, this.updateDataServer, this.stream, this.getGame, this.isAlive, this.lose, this.win}) : super(key: key);
-
-  @override
-  _BoardWidgetState createState() => _BoardWidgetState();
-}
-
-class _BoardWidgetState extends State<BoardWidget> {
-  BoardBloc _bloc;
-
-  @override
-  void initState() { 
-    _bloc = BoardBloc(widget.updateDataServer, widget.stream, widget.getGame, widget.isAlive, widget.lose, widget.win);
-    super.initState();
-  }  
-
+class BoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _bloc.listTableRows.stream,
-      builder: (context, snapshot) {
-        return snapshot.hasData
+    return StoreConnector<AppState, BoardViewModel>(
+      model: BoardViewModel(),
+      builder: (context, boardView) {
+        WidgetsBinding.instance.addPostFrameCallback(
+            (_) => resultGame(boardView.statusGame, boardView.resetGame, context));
+        return boardView.listStates != null
             ? Table(
-                children: snapshot.data,
+                children: boardView.generateTable(),
               )
             : Center(
                 child: CircularProgressIndicator(),
               );
       },
     );
+  }
+
+  Future<void> resultGame(
+      StatusGame status, Function(bool) resetGame, BuildContext context) async {
+    if (status != StatusGame.running && status != null) {
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            title: Text(status == StatusGame.won ? "Parabéns" : "Puts"),
+            content: Text(
+              status == StatusGame.won ? "Você ganhou!" : "Você perdeu :(",
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Iniciar novamente"),
+                onPressed: () => Navigator.of(context).pop(true),
+              )
+            ],
+          )).then((again) => resetGame(again ?? false));
+    }
   }
 }

@@ -1,15 +1,9 @@
-import 'package:desafio_campo_minado/src/modules/game/game_bloc.dart';
-import 'package:desafio_campo_minado/src/modules/game/game_module.dart';
-import 'package:desafio_campo_minado/src/modules/game/widgets/score/score_bloc.dart';
+import 'package:async_redux/async_redux.dart';
+import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
+import 'package:desafio_campo_minado/src/modules/game/widgets/score/score_view_model.dart';
 import 'package:flutter/material.dart';
 
 class ScoreWidget extends StatelessWidget {
-  final ScoreBloc bloc = GameModule.to.get<ScoreBloc>();
-  final GameBloc gameBloc = GameModule.to.get<GameBloc>();
-
-  ScoreWidget({Key key}) : super(key: key){
-    if(gameBloc.game.bombs != null) bloc.flags.sink.add(gameBloc.game.bombs);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +19,10 @@ class ScoreWidget extends StatelessWidget {
               children: <Widget>[
                 Icon(Icons.flag, color: Colors.redAccent,),
                 Container(width: 5,),
-                StreamBuilder<int>(
-                  stream: bloc.flags.stream,
-                  initialData: 0,
-                  builder: (BuildContext context, snapshot){
-                    return Text(snapshot.data.toString());
+                StoreConnector<AppState, ScoreViewModel>(
+                  model: ScoreViewModel(),
+                  builder: (BuildContext context, scoreView){
+                    return Text(scoreView.flags.toString());
                   },
                 ),
               ],
@@ -41,11 +34,10 @@ class ScoreWidget extends StatelessWidget {
               children: <Widget>[
                 Icon(Icons.timer, color: Colors.yellowAccent,),
                 Container(width: 5,),
-                StreamBuilder<int>(
-                  stream: bloc.secondsElapsed.stream,
-                  initialData: 0,
-                  builder: (BuildContext context, snapshot){
-                    return Text(snapshot.data.toString().padLeft(3, '0'));
+                StoreConnector<AppState, ScoreViewModel>(
+                  model: ScoreViewModel(),
+                  builder: (BuildContext context, scoreView){
+                    return Text(scoreView.secondsElapsed.toString().padLeft(3, '0'));
                   },
                 ),
               ],

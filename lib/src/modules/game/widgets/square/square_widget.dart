@@ -1,4 +1,3 @@
-import 'package:desafio_campo_minado/src/modules/game/widgets/square/square_bloc.dart';
 import 'package:flutter/material.dart';
 
 enum SquareState { released, flag, pressed }
@@ -7,30 +6,23 @@ class SquareWidget extends StatelessWidget {
   final bool colorSwitch;
   final int posX;
   final int posY;
-
-  /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
   final Function(bool, int) onTap;
-
-  /// The returns will update the state of the square, the bool is if a bomb and the int bombProximity
   final Function(bool, int) onLongTap;
   final bool isBomb;
-  SquareState get state => _bloc.state.value;
-  Sink<SquareState> get sinkState => _bloc.state.sink;
   final int bombProximity;
+  final SquareState state;
 
-  SquareWidget(
-      {Key key,
-      this.colorSwitch = true,
-      this.onTap,
-      this.onLongTap,
-      this.bombProximity,
-      this.isBomb,
-      this.posX,
-      this.posY,
-      SquareState initialState})
-      : super(key: key) {
-    if(initialState != null) sinkState.add(initialState);
-  }
+  SquareWidget({
+    Key key,
+    this.colorSwitch = true,
+    this.onTap,
+    this.onLongTap,
+    this.bombProximity,
+    this.isBomb,
+    this.posX,
+    this.posY,
+    this.state,
+  }) : super(key: key);
 
   final Map<int, Color> colorText = <int, Color>{
     1: Colors.blue[800],
@@ -44,41 +36,35 @@ class SquareWidget extends StatelessWidget {
     9: Colors.blueGrey,
   };
 
-  final SquareBloc _bloc = SquareBloc();
-
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SquareState>(
-        stream: _bloc.state.stream,
-        builder: (context, snapshot) {
-          return Ink(
-            color: snapshot.data != SquareState.pressed
-                ? colorSwitch ? Colors.green[400] : Colors.green[600]
-                : colorSwitch ? Colors.brown[100] : Colors.brown[200],
-            child: InkWell(
-              onTap: snapshot.data != SquareState.pressed
-                  ? () {
-                      onTap(isBomb, bombProximity);
-                    }
-                  : null,
-              onLongPress: snapshot.data != SquareState.pressed
-                  ? () {
-                      onLongTap(isBomb, bombProximity);
-                    }
-                  : null,
-              splashColor: Colors.green[800],
-              child: Container(
-                  height: 30,
-                  width: 30,
-                  alignment: Alignment.center,
-                  child: _getIcon()),
-            ),
-          );
-        });
+    return Ink(
+      color: state != SquareState.pressed
+          ? colorSwitch ? Colors.green[400] : Colors.green[600]
+          : colorSwitch ? Colors.brown[100] : Colors.brown[200],
+      child: InkWell(
+        onTap: state != SquareState.pressed
+            ? () {
+                onTap(isBomb, bombProximity);
+              }
+            : null,
+        onLongPress: state != SquareState.pressed
+            ? () {
+                onLongTap(isBomb, bombProximity);
+              }
+            : null,
+        splashColor: Colors.green[800],
+        child: Container(
+            height: 30,
+            width: 30,
+            alignment: Alignment.center,
+            child: _getIcon()),
+      ),
+    );
   }
 
   Widget _getIcon() {
-    if (_bloc.state.value == SquareState.flag) {
+    if (state == SquareState.flag) {
       return Icon(
         Icons.flag,
         color: Colors.red[700],
@@ -87,7 +73,7 @@ class SquareWidget extends StatelessWidget {
       return Text("💣");
     } else {
       return Text(
-        _bloc.state.value == SquareState.pressed
+        state == SquareState.pressed
             ? bombProximity != null && bombProximity != 0
                 ? bombProximity.toString()
                 : ''

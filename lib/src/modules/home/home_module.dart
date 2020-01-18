@@ -1,5 +1,4 @@
 import 'package:async_redux/async_redux.dart';
-import 'package:desafio_campo_minado/src/app/app_module.dart';
 import 'package:desafio_campo_minado/src/app/redux/app_state.dart';
 import 'package:desafio_campo_minado/src/app/redux/states.dart';
 import 'package:flutter_modular/flutter_modular.dart';
