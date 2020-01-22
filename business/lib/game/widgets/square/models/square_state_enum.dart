@@ -1,0 +1,1 @@
+enum SquareState { released, flag, pressed }
