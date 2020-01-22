@@ -1,12 +1,16 @@
 import 'package:async_redux/async_redux.dart';
 import 'package:business/app/app_state.dart';
-import 'package:business/game/actions/game_actions.dart';
-import 'package:business/game/widgets/board/actions/board_actions.dart';
+import 'package:business/game/actions/lose_game_action.dart';
+import 'package:business/game/actions/reset_game_action.dart';
+import 'package:business/game/actions/win_game_action.dart';
+import 'package:business/game/widgets/board/actions/change_square_state_list_action.dart';
+import 'package:business/game/widgets/board/actions/sync_changes_with_server.dart';
 import 'package:business/game/widgets/board/models/status_game_enum.dart';
-import 'package:business/game/widgets/score/actions/score_actions.dart';
+import 'package:business/game/widgets/score/actions/add_flag_action.dart';
+import 'package:business/game/widgets/score/actions/remove_flag_action.dart';
+import 'package:business/game/widgets/score/actions/start_stop_timer_action.dart';
 import 'package:business/game/widgets/square/models/square_state_enum.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 
 class BoardViewModel extends BaseModel<AppState> {
   final List<List<SquareState>> listStates;
@@ -20,11 +24,11 @@ class BoardViewModel extends BaseModel<AppState> {
   BoardViewModel({this.listStates, this.cols, this.rows, this.listBombs, this.flags, this.isAlive, this.victory}) : super(equals: [listStates, cols, rows, listBombs, flags, isAlive, victory]);
 
   void _lose() {
-    dispatch(LoseGameAction(game: state.gameState.game));
+    dispatch(LoseGameAction(state.gameState.game));
   }
 
   void _win() {
-    dispatch(WinGameAction(game: state.gameState.game));
+    dispatch(WinGameAction(state.gameState.game));
   }
 
   void resetGame(bool newGame) {

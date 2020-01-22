@@ -8,10 +8,7 @@ environment:
 dependencies:
   business:
     path: ./business/
-  cloud_firestore: ^0.13.0+1
-  firebase_core: ^0.4.3+2
   async_redux: ^2.5.0
-  random_string: ^2.0.1
   flutter:
     sdk: flutter
 

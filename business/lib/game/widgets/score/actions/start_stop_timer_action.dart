@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:async_redux/async_redux.dart';
 import 'package:business/app/app_state.dart';
-import 'package:business/game/actions/game_actions.dart';
+import 'package:business/game/actions/change_game_model_action.dart';
 
 Timer _timer;
 
@@ -56,39 +56,5 @@ class StopTimerAction extends ReduxAction<AppState> {
     _timer.cancel();
     _timer = null;
     return null;
-  }
-}
-
-class AddFlagAction extends ReduxAction<AppState> {
-  AddFlagAction();
-
-  @override
-  AppState reduce() {
-    if (state.gameState.game.flags + 1 <= state.gameState.game.bombs)
-      return state.copyWith(
-        gameState: state.gameState.copyWith(
-          game: state.gameState.game
-              .copyWith(flags: state.gameState.game.flags + 1),
-        ),
-      );
-    else
-      return null;
-  }
-}
-
-class RemoveFlagAction extends ReduxAction<AppState> {
-  RemoveFlagAction();
-
-  @override
-  AppState reduce() {
-    if (state.gameState.game.flags - 1 > 0)
-      return state.copyWith(
-        gameState: state.gameState.copyWith(
-          game: state.gameState.game
-              .copyWith(flags: state.gameState.game.flags - 1),
-        ),
-      );
-    else
-      return null;
   }
 }
